@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
 export const authenticate = (req: Request, res: Response): void => {
-  const token = req.cookies.jwt; // Get the JWT from the cookie
+  const token = req.cookies?.jwt; 
+  console.log(token)// Get the JWT from the cookie
 
   if (!token) {
     res.status(401).json({ error: "Access Denied. No token provided." });
