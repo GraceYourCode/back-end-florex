@@ -1,4 +1,4 @@
-function isValidPassword(password: string): boolean {
+export const isValidPassword = (password: string): boolean => {
   const hasUpperCase = /[A-Z]/;
   const hasLowerCase = /[a-z]/;
   const hasNumber = /\d/;
@@ -14,3 +14,8 @@ function isValidPassword(password: string): boolean {
     isLongEnough
   );
 }
+
+export const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};

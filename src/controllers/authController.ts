@@ -2,7 +2,8 @@ import * as bcrypt from "bcrypt"; // Import the entire bcrypt module
 import * as jwt from "jsonwebtoken"; // Import the entire jsonwebtoken module
 import { Request, Response } from "express"; // Import Express types
 import { User } from "../models/userModel";
-import cookie from "cookie";
+import { isValidEmail, isValidPassword } from "../utils/functions";
+import { generateToken, revokeToken, verifyToken } from "../utils/jwtUtils";
 
 require("dotenv").config(); // Load environment variables for JWT_SECRET
 
@@ -35,6 +36,13 @@ export const signup = async (
       middleName,
       isClient,
     } = req.body;
+
+    //Checks if password format is acceptable
+    if (!isValidPassword(password) || !isValidEmail(email))
+      res.status(400).json({
+        success: false,
+        error: "Password or email Format is not valid",
+      });
 
     // Checking if the user already exists
     const existingUser = await User.findOne({ email });
@@ -88,22 +96,9 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
       res.status(400).json({ error: "Invalid email or password!" });
     } else {
       // Generate a JWT
-      const token = jwt.sign(
-        { userId: user._id },
-        process.env.JWT_SECRET as string,
-        {
-          expiresIn: "2h",
-        }
-      );
+      const token = generateToken(email);
 
-      // Set the token as a cookie
-      res.cookie("jwt", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 3600000 * 2,
-      });
-
-      res.status(200).json({ message: "Successfully logged in" });
+      res.status(200).json({ message: "Successfully logged in", token });
     }
   } catch (err) {
     console.error(err);
@@ -112,10 +107,26 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
 };
 
 // Log out controller (clear the JWT cookie)
-export const logOut = (req: Request, res: Response): void => {
-  res.clearCookie("jwt", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-  });
-  res.status(200).json({ message: "Logged out successfully" });
+export const logout = async (req: Request, res: Response) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (token) {
+    await revokeToken(token); // Add token to the revoked list
+  }
+  res.status(200).json({ message: 'Logged out successfully.' });
+};
+
+export const session = async (req: Request, res: Response) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) {
+    res.status(200).json({ session: null });
+    return;
+  }
+
+  const decoded = await verifyToken(token);
+  if (decoded) {
+    res.status(200).json({ session: true });
+    return
+  }
+
+  res.status(401).json({ session: null });
 };
