@@ -75,4 +75,4 @@ The base URL for all API requests is:
 
 ### **Protected Routes**
 - **Endpoint:** `GET /auth/session`
-- **Description:** Returns a boolean ```code true ``` if user's session token hasn't expired and ```code null ``` if the token has expired.
+- **Description:** Returns a boolean ```true``` if user's session token hasn't expired and ```null``` if the token has expired.
