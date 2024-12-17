@@ -1,6 +1,5 @@
-import * as bcrypt from "bcrypt"; // Import the entire bcrypt module
-import * as jwt from "jsonwebtoken"; // Import the entire jsonwebtoken module
-import { Request, Response } from "express"; // Import Express types
+import * as bcrypt from "bcrypt";
+import { Request, Response } from "express";
 import { User } from "../models/userModel";
 import { isValidEmail, isValidPassword } from "../utils/functions";
 import { generateToken, revokeToken, verifyToken } from "../utils/jwtUtils";
@@ -46,8 +45,9 @@ export const signup = async (
 
     // Checking if the user already exists
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
-      res.status(400).json({ error: "User already exists." });
+      res.status(400).json({ success: false, error: "User already exists." });
     } else {
       // Hash the password for protection
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -67,11 +67,13 @@ export const signup = async (
 
       await user.save();
 
-      res.status(201).json({ message: "User registered successfully!" });
+      res
+        .status(201)
+        .json({ success: true, message: "User registered successfully!" });
     }
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error", full: err });
+    res.status(500).json({ error: "Server error", success: false });
   }
 };
 
@@ -85,7 +87,7 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      res.status(400).json({ error: "User not registered!" });
+      res.status(400).json({ success: false, error: "User not registered!" });
       return;
     }
 
@@ -93,40 +95,28 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      res.status(400).json({ error: "Invalid email or password!" });
+      res
+        .status(400)
+        .json({ success: false, error: "Invalid email or password!" });
     } else {
       // Generate a JWT
       const token = generateToken(email);
 
-      res.status(200).json({ message: "Successfully logged in", token });
+      res
+        .status(200)
+        .json({ success: true, message: "Successfully logged in", token });
     }
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ success: false, error: "Server error" });
   }
 };
 
 // Log out controller (clear the JWT cookie)
 export const logout = async (req: Request, res: Response) => {
-  const token = req.headers.authorization?.split(' ')[1];
+  const token = req.headers.authorization?.split(" ")[1];
   if (token) {
     await revokeToken(token); // Add token to the revoked list
   }
-  res.status(200).json({ message: 'Logged out successfully.' });
-};
-
-export const session = async (req: Request, res: Response) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) {
-    res.status(200).json({ session: null });
-    return;
-  }
-
-  const decoded = await verifyToken(token);
-  if (decoded) {
-    res.status(200).json({ session: true });
-    return
-  }
-
-  res.status(401).json({ session: null });
+  res.status(200).json({ message: "Logged out successfully." });
 };

@@ -71,8 +71,65 @@ The base URL for all API requests is:
 }
 ```
 
+### **3. Send Verification Email**
+- **Endpoint:** `POST /verification/send-mail`
+- **Description:** Sends an OTP to the user’s email for verification.
+
+#### **Request Body Types(JSON)**
+```typescript
+{
+  email: string;
+  firstName: string;
+}
+```
+
+### **4. Verify Email**
+- **Endpoint:** `POST /verification/verify-mail`
+- **Description:** Verifies the code sent to the user's email.
+
+#### **Request Body Types(JSON)**
+```typescript
+{
+  email: string;
+  code: string;
+}
+```
+
+## **Users Routes**
+
+### **1. Fetch All Users**
+- **Endpoint:** `GET /users`
+- **Description:** Returns data of all the registered users on the database.
+
+### **2. Fetch A User**
+- **Endpoint:** `GET /users/:userId`
+- **Description:** Returns data of a particular user whose id was provided.
+
+### **3. Delete A User**
+- **Endpoint:** `DELETE /users/:userId`
+- **Description:** Deletes user whose id was provided.
+
+### **4. Change Password**
+- **Endpoint:** `PATCH /users/:userId/update-password`
+- **Description:** Changes and updates the user password
+
+#### **Request Body Types(JSON)**
+```typescript
+{
+  oldPassword: string;
+  newPassword: string;
+}
+```
+
 ## **MiddleWare and Authentication**
 
 ### **Protected Routes**
 - **Endpoint:** `GET /auth/session`
 - **Description:** Returns a boolean ```true``` if user's session token hasn't expired and ```null``` if the token has expired.
+- To access protected routes, include the JWT token in the **Authorization** header as follows:
+
+```json
+{
+  "Authorization": "Bearer <jwt-token>"
+}
+```

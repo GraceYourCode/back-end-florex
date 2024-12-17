@@ -52,3 +52,4 @@ temp/
 
 #others
 text
+src/server.ts

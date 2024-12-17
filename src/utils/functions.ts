@@ -19,3 +19,12 @@ export const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
+
+export const generateCode = () => {
+  let code = "";
+  for (let i = 0; i < 5; i++) {
+    let digit = Math.floor(Math.random() * 9)
+    code += digit;
+  }
+  return code;
+}
