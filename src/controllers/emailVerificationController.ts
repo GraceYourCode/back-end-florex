@@ -3,6 +3,7 @@ import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import { generateCode } from "../utils/functions";
 import { Code } from "../models/emailCodes";
+import { User } from "../models/userModel";
 
 dotenv.config();
 
@@ -86,7 +87,13 @@ export const verifyMail = async (req: Request, res: Response) => {
   }
   if (code === existingCode.code && email === existingCode.email) {
     existingCode.expired = true;
+
+    const user = await User.findOne({email});
+    user.isEmailVerified = true;
+
     await existingCode.save();
+    await user.save();
+
     res.status(200).json({ success: true, message: "Email Verified" });
   } else res.status(400).json({ success: false, error: "Incorrect code" });
 };

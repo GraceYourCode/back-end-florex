@@ -3,9 +3,9 @@ import { deleteAUser, getAUser, getUsers, updatePassword } from "../controllers/
 
 const router = express.Router();
 
-router.get("/users", getUsers);
-router.get("/users/:userId", getAUser);
-router.delete("/users/:userId", deleteAUser);
-router.patch("/users/:userId/update-password", updatePassword)
+router.get("/", getUsers);
+router.get("/:userId", getAUser);
+router.delete("/:userId", deleteAUser);
+router.patch("/:userId/update-password", updatePassword)
 
 export default router;

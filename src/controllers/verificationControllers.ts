@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import twilio from "twilio";
+import { User } from "../models/userModel";
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID!;
 const authToken = process.env.TWILIO_AUTH_TOKEN!;
@@ -52,6 +53,11 @@ export const verifyCode = async (req: Request, res: Response) => {
       .verificationChecks.create({ to: phoneNumber, code: code });
 
     if (response.status === "approved") {
+      const user = await User.findOne({phone: phoneNumber})
+
+      user.isPhoneNumberVerified = true;
+
+      await user.save()
       res.status(200).json({
         success: true,
         message: "Phone number verified successfully.",

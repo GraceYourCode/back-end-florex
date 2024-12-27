@@ -12,6 +12,8 @@ interface IUser extends Document {
   isEmailVerified: boolean;
   isPhoneNumberVerified: boolean;
   isClient: boolean;
+  resetToken: string;
+  resetTokenExp: boolean;
 }
 const userSchema = new Schema<IUser>({
     email: {
@@ -27,6 +29,7 @@ const userSchema = new Schema<IUser>({
     phone: {
         type: String,
         required: [true, "Phone number is required!"],
+        unique: true,
     },
     isEmailVerified: {
         type: Boolean,
@@ -59,6 +62,14 @@ const userSchema = new Schema<IUser>({
     isClient: {
       type: Boolean,
       required: [true, "Status of User is required!"]
+    },
+    resetToken: {
+      type: String,
+      default: ""
+    },
+    resetTokenExp: {
+      type: Boolean,
+      default: true,
     }
 });
 
