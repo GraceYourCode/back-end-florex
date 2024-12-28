@@ -60,6 +60,7 @@ export const sendMail = async (req: Request, res: Response) => {
 
     res.status(200).json({ success: true, message: "Email sent successfully" });
   } catch (err) {
+    console.log(err)
     console.log((err as Error).message);
     res
       .status(500)
