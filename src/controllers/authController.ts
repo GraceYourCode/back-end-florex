@@ -41,6 +41,7 @@ export const signup = async (
       lastName,
       middleName,
       isClient,
+      isEmailVerified,
     } = req.body;
 
     //Checks if password or email format is acceptable
@@ -70,6 +71,7 @@ export const signup = async (
         middleName,
         dob,
         isClient,
+        isEmailVerified,
       });
 
       await user.save();
