@@ -64,7 +64,7 @@ export const signup = async (
       const user = new User({
         email,
         password: hashedPassword,
-        // phone,
+        phone: "",
         country,
         firstName,
         lastName,
