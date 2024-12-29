@@ -64,7 +64,7 @@ export const signup = async (
       const user = new User({
         email,
         password: hashedPassword,
-        phone: "",
+        phone: " ",
         country,
         firstName,
         lastName,
@@ -132,7 +132,7 @@ export const logout = async (req: Request, res: Response) => {
 
 export const forgotPassword = async (req: Request, res: Response) => {
   const { email } = req.body;
-  const verificationCode = generateCode();
+  const code = generateCode();
   const token = crypto.randomBytes(32).toString("hex");
 
   const user = await User.findOne({ email });
@@ -158,7 +158,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
     html: `
     <div>
       <p>Here's a response to your request that you forgot your password</p>
-      Your One-Time Password(OTP) is <strong>${verificationCode}</strong>
+      Your One-Time Password(OTP) is <strong>${code}</strong>
       <p>This code expires after 10 minutes</p>
       <p>If you didn't make this request, kindlyignore this email</p>
     </div>
@@ -168,33 +168,20 @@ export const forgotPassword = async (req: Request, res: Response) => {
   try {
     await transporter.sendMail(mailOptions);
 
-    const existingCode = await Code.find({ email });
+    await Code.deleteMany({ email });
 
-    if (existingCode.length > 0) {
-      existingCode.forEach(async (code) => {
-        code.expired = true;
-        await code.save();
-      });
-    }
-
+    const expiredAt = new Date(Date.now() + 10 * 60 * 1000);
     user.resetToken = token;
-    user.resetTokenExp = false;
+    user.resetTokenExp = expiredAt;
 
-    const code = await new Code({
+    const newcode = await new Code({
       email,
-      code: verificationCode,
+      code,
+      expiredAt
     });
 
     await user.save();
-    await code.save();
-
-    setTimeout(async () => {
-      code.expired = true;
-      user.resetTokenExp = true;
-
-      await user.save();
-      await code.save();
-    }, 60000 * 10);
+    await newcode.save();
 
     res
       .status(200)
@@ -220,20 +207,23 @@ export const createNewPassword = async (req: Request, res: Response) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email, token });
 
     if (!user) {
-      res.status(404).json({ success: false, error: "User not found!" });
+      res.status(403).json({ success: false, error: "Email and request password token do not correspond" });
       return;
     }
 
-    if (user.resetToken === token && !user.resetTokenExp) {
-      user.password = hashedPassword;
-      user.resetTokenExp = true;
-      await user.save();
+    if (user.resetTokenExp < new Date()) {
+      res.status(403).json({ success: false, error: "Session expired!" });
+      return;
+    }
 
-      res.status(201).json({ success: true, message: "New password created!" });
-    } else res.status(403).json({ success: false, error: "Session expired!" });
+    user.password = hashedPassword;
+    user.resetTokenExp = new Date();
+    await user.save();
+
+    res.status(201).json({ success: true, message: "New password created!" });
   } catch (err) {
     console.log((err as Error).message);
     res.status(500).json({ success: false, error: "Server error" });

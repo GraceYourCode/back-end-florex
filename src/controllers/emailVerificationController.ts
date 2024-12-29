@@ -9,7 +9,7 @@ dotenv.config();
 
 export const sendMail = async (req: Request, res: Response) => {
   const { email, firstName } = req.body;
-  const verificationCode = generateCode();
+  const code = generateCode();
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -27,40 +27,28 @@ export const sendMail = async (req: Request, res: Response) => {
     html: `
     <div>
       <p>Welcome ${firstName}, thanks for joining Future 4rx. </p>
-      Your verification code is <strong>${verificationCode}</strong>
+      Your verification code is <strong>${code}</strong>
       <p>This code expires after 10 minutes</p>
     </div>
     `,
   };
 
   try {
-    const existingCode = await Code.find({ email });
-
-    if (existingCode.length > 0) {
-      existingCode.forEach(async (code) => {
-        code.expired = true;
-        await code.save();
-      });
-    }
+    await Code.deleteMany({ email });
 
     await transporter.sendMail(mailOptions);
 
-    const code = await new Code({
+    const expiredAt = new Date(Date.now() + 10 * 60 * 1000);
+    const newcode = await new Code({
       email,
-      code: verificationCode,
+      code,
+      expiredAt,
     });
 
-    await code.save();
-
-    setTimeout(async () => {
-      code.expired = true;
-
-      await code.save();
-    }, 60000 * 10);
+    await newcode.save();
 
     res.status(200).json({ success: true, message: "Email sent successfully" });
   } catch (err) {
-    console.log(err)
     console.log((err as Error).message);
     res
       .status(500)
@@ -71,26 +59,22 @@ export const sendMail = async (req: Request, res: Response) => {
 export const verifyMail = async (req: Request, res: Response) => {
   const { code, email } = req.body;
 
-  const existingCode = await Code.findOne({ code });
+  const existingCode = await Code.findOne({ code, email });
 
   if (!existingCode) {
     res
       .status(400)
-      .json({ success: false, error: "Invalid verification code" });
+      .json({ success: false, error: "Invalid verification code or email" });
     return;
   }
 
-  if (existingCode.expired) {
+  if (existingCode.expiredAt < new Date()) {
     res
       .status(401)
       .json({ success: false, error: "Verification Code expired" });
     return;
   }
-  if (code === existingCode.code && email === existingCode.email) {
-    existingCode.expired = true;
-    
-    await existingCode.save();
 
-    res.status(200).json({ success: true, message: "Email Verified" });
-  } else res.status(400).json({ success: false, error: "Incorrect code" });
+  await Code.deleteOne({ code, email });
+  res.status(200).json({ success: true, message: "Email Verified" });
 };

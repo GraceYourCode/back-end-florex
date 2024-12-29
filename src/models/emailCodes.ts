@@ -3,7 +3,7 @@ import { model, models, Schema } from "mongoose";
 interface ICode extends Document {
   email: string;
   code: string | number;
-  expired: boolean;
+  expiredAt: Date;
 }
 
 const codeSchema = new Schema<ICode>({
@@ -15,9 +15,9 @@ const codeSchema = new Schema<ICode>({
     type: String || Number,
     required: true
   },
-  expired: {
-    type: Boolean,
-    default: false
+  expiredAt: {
+    type: Date,
+    required: true,
   }
 })
 

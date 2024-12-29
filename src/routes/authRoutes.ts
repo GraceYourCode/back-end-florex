@@ -8,7 +8,7 @@ router.post('/signup', signup);
 router.post('/signin', signin);
 router.post('/logout', logout);
 router.post("/forgot-password", forgotPassword);
-router.post("/reset-password", createNewPassword);
+router.patch("/reset-password", createNewPassword);
 router.get('/session', session);
 
 export default router;

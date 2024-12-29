@@ -45,6 +45,37 @@ The base URL for all API requests is:
 ### **3. Log Out**
 - **Endpoint:** `POST /auth/logout`
 - **Description:** Logs the user out by clearing the cookie.
+- To log out successfully, include the JWT token in the **Authorization** header as follows:
+
+```json
+{
+  "Authorization": "Bearer <jwt-token>"
+}
+```
+
+### **4. Forgot Password**
+- **Endpoint:** `POST /auth/forgot-password`
+- **Description:** Sends a request to the email of the user with an OTP to validate his request. The OTP is then verified with the `/verification/verify-mail` endpoint. After which a new password is then generated with the `/auth/reset-password` endpoint.
+
+#### **Request Body Types(JSON)**
+```typescript
+{
+  email: string;
+}
+```
+
+### **5. Reset Password**
+- **Endpoint:** `PATCH /auth/reset-password`
+- **Description:** Updates a new password to the database after the forgot password request has been verified
+
+#### **Request Body Types(JSON)**
+```typescript
+{
+  email: string;
+  password: string;
+  token: string; //returned along with a success message if email was sent successfully from the forgot-password endpoint
+}
+```
 
 ## **Verification Routes**
 
@@ -126,8 +157,12 @@ The base URL for all API requests is:
 ### **Protected Routes**
 - **Endpoint:** `GET /auth/session`
 - **Description:** Returns a boolean ```true``` if user's session token hasn't expired and ```null``` if the token has expired.
+- **Note:** All users must be validated through the session route before accessing other endpoints. Here are the endpoints:
+1. Log Out
+2. Send Verification SMS
+3. Verify Code
+4. Change Password
 - To access protected routes, include the JWT token in the **Authorization** header as follows:
-
 ```json
 {
   "Authorization": "Bearer <jwt-token>"

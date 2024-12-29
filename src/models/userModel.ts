@@ -13,7 +13,7 @@ interface IUser extends Document {
   isPhoneNumberVerified: boolean;
   isClient: boolean;
   resetToken: string;
-  resetTokenExp: boolean;
+  resetTokenExp: Date | null;
 }
 const userSchema = new Schema<IUser>({
     email: {
@@ -68,8 +68,8 @@ const userSchema = new Schema<IUser>({
       default: ""
     },
     resetTokenExp: {
-      type: Boolean,
-      default: true,
+      type: Date || null,
+      default: null,
     }
 });
 
