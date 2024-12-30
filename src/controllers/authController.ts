@@ -31,6 +31,8 @@ export const signup = async (
       isEmailVerified,
     } = req.body;
 
+    console.log(email, password, country, dob, firstName, lastName)
+
     //Checks if password or email format is acceptable
     if (!isValidPassword(password) || !isValidEmail(email))
       res.status(400).json({
