@@ -13,33 +13,20 @@ import { generateToken, revokeToken, verifyToken } from "../utils/jwtUtils";
 import { Code } from "../models/emailCodes";
 
 dotenv.config();
-// Interface for user data (optional but recommended for type safety)
-interface UserInput {
-  email: string;
-  password: string;
-  phone: string;
-  country: string;
-  firstName: string;
-  lastName: string;
-  middleName?: string;
-  dob: Date;
-}
 
 // Sign-up controller
 export const signup = async (
-  req: Request<UserInput>,
+  req: Request,
   res: Response
 ): Promise<void> => {
   try {
     const {
       email,
       password,
-      phone,
       country,
       dob,
       firstName,
       lastName,
-      middleName,
       isClient,
       isEmailVerified,
     } = req.body;
@@ -64,11 +51,9 @@ export const signup = async (
       const user = new User({
         email,
         password: hashedPassword,
-        phone: " ",
         country,
         firstName,
         lastName,
-        // middleName,
         dob,
         isClient,
         isEmailVerified,
