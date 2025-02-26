@@ -1,30 +1,35 @@
 import { model, models, Schema } from "mongoose";
 
 interface IMessage {
-  sender: Schema.Types.ObjectId;
-  receiver: Schema.Types.ObjectId;
+  sender: string;
+  receiver: string;
   message: string;
   timeStamp: Date;
+  roomId: Schema.Types.ObjectId;
 };
 
 const messageSchema = new Schema<IMessage>({
   receiver: {
-    type: Schema.Types.ObjectId,
+    type: String,
     required: [true, "the receiver is required"!]
   },
   sender: {
-    type: Schema.Types.ObjectId,
+    type: String,
     required: [true, "the sender is required!"]
   },
   message: {
     type: String,
-    required: [true, "You can't send an emoty message"]
+    required: [true, "You can't send an empty message"]
   },
   timeStamp: {
     type: Date,
     required: [true, "Date is required!"],
     default: Date.now,
-  }
+  },
+  roomId: {
+    type: Schema.Types.ObjectId,
+    required: [true, "the room id is required!"]
+  },
 });
 
 export const Message = models.Message || model<IMessage>("Message", messageSchema);

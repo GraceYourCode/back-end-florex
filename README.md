@@ -168,3 +168,41 @@ The base URL for all API requests is:
   "Authorization": "Bearer <jwt-token>"
 }
 ```
+
+## **Chats and Messaging**
+
+### **1. Create a room**
+- **Endpoint:** `POST /chats/create-room`
+- **Description:** This endpoint creates a room for two users to start exchanging messages
+
+#### **Request Body Types(JSON)**
+```typescript
+{
+  user1: string; //email of the first user
+  user2: string; //email of the second user
+}
+```
+
+### **2. Send Messages**
+- **Endpoint:** `POST /chats/send-message`
+- **Description:** Endpoit to send messages
+
+#### **Request Body Types(JSON)**
+```typescript
+{
+  sender: string; //email of the first user
+  receiver: string; //email of the second user
+  message: string;
+}
+```
+
+### **3. Get messages**
+- **Endpoint:** `GET /chat/get-messages/:roomId`
+- **Description:** Gets all the messages sent in a particular room
+
+#### **Request Body Types(JSON)**
+```typescript
+{
+  roomId: string;
+}
+```

@@ -9,10 +9,10 @@ export const getUsers = async (req: Request, res: Response) => {
 };
 
 export const getAUser = async (req: Request, res: Response) => {
-  const { userId } = req.params;
+  const { email } = req.params;
 
   try {
-    const existingUser = await User.findById(userId);
+    const existingUser = await User.find({email});
 
     if (!existingUser) {
       res.status(404).json({ success: false, error: "User not found" });

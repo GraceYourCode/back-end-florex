@@ -15,13 +15,13 @@ connectToDB();
 const io = new Server(server);
 
 // Listen for client connections
-// io.on("connection", (socket) => {
-//   console.log(`New client connected: ${socket.id}`);
-// });
+io.on("connection", (socket) => {
+  console.log(`New client connected: ${socket.id}`);
+});
 
 // Start the server
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
 
-export default server;
+// export default server;

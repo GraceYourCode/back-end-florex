@@ -4,7 +4,7 @@ import { deleteAUser, getAUser, getUsers, updatePassword } from "../controllers/
 const router = express.Router();
 
 router.get("/", getUsers);
-router.get("/:userId", getAUser);
+router.get("/:email", getAUser);
 router.delete("/:userId", deleteAUser);
 router.patch("/:userId/update-password", updatePassword)
 

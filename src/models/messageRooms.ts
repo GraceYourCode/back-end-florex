@@ -1,12 +1,12 @@
 import { model, models, Schema } from "mongoose";
 
 interface IRooms {
-  users: [Schema.Types.ObjectId, Schema.Types.ObjectId]
+  users: [string, string]
 }
 
 const roomSchema = new Schema<IRooms> ({
  users: {
-  type: [Schema.Types.ObjectId, Schema.Types.ObjectId],
+  type: [String, String],
   required: [true, "Both users are required!"]
  }
 })
