@@ -31,7 +31,7 @@ export const signup = async (
       isEmailVerified,
     } = req.body;
 
-    if (!email || !password || !country || !dob || !firstName || !lastName || !isClient || !isEmailVerified)
+    if (!email || !password || !country || !dob || !firstName || !lastName || (typeof isClient !== "boolean") || !isEmailVerified)
       res.status(400).json({success: false, error: "Details not complete"})
 
     //Checks if password or email format is acceptable
